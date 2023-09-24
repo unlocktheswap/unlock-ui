@@ -1,10 +1,10 @@
 'use client';
 
 import './App.css';
-import { JsonRpcSigner, Web3Provider } from '@ethersproject/providers';
-import { useState, useEffect } from 'react';
-import { ethers } from 'ethers';
-import { GearFill } from 'react-bootstrap-icons';
+import {JsonRpcSigner, Web3Provider} from '@ethersproject/providers';
+import {useState, useEffect} from 'react';
+import {ethers} from 'ethers';
+import {GearFill} from 'react-bootstrap-icons';
 
 import PageButton from './components/PageButton';
 import ConnectButton from './components/ConnectButton';
@@ -46,22 +46,31 @@ function Swap() {
 
   useEffect(() => {
     const onLoad = async () => {
-      const provider = await new ethers.providers.Web3Provider(window.ethereum);
+      const provider = await new Web3Provider(window.ethereum, 5);
+      console.log('provider', provider);
       setProvider(provider);
 
-      const wethContract = getWethContract();
+      let signer1 = provider.getSigner();
+      console.log('signer1', signer1)
+      setSigner(signer1);
+
+      const wethContract = getWethContract(provider);
+      console.log('wethContract', wethContract);
+
       setWethContract(wethContract);
 
-      const uniContract = getUniContract();
+      const uniContract = getUniContract(provider);
+      console.log('uniContract', uniContract);
       setUniContract(uniContract);
     };
     onLoad();
   }, []);
 
   const getSigner = async (provider: Web3Provider) => {
+    console.log('getSigner', provider);
     if (provider.provider && 'request' in provider.provider) {
       try {
-        await provider.provider.request?.({ method: 'eth_requestAccounts' });
+        await provider.provider.request?.({method: 'eth_requestAccounts'});
         const signer = provider.getSigner();
         setSigner(signer);
       } catch (error) {
@@ -88,21 +97,23 @@ function Swap() {
     getWalletAddress();
   }
 
-  const getSwapPrice = (inputAmount: string) => {
+  const getSwapPrice = async (inputAmount: string) => {
     setLoading(true);
     setInputAmount(inputAmount);
 
-    const swap = getPrice(
-      inputAmount || 2,
-      slippageAmount,
-      Math.floor(Date.now() / 1000 + deadlineMinutes * 60),
-      signerAddress,
-    ).then((data) => {
-      setTransaction(data?.[0]);
-      setOutputAmount(data?.[1]);
-      setRatio(data?.[2]);
-      setLoading(false);
-    });
+    let priceData = await getPrice(
+      provider!,
+      100,
+      '4',
+      signerAddress!,
+    );
+
+    console.log('priceData', priceData);
+    setTransaction(priceData?.[0]);
+    setOutputAmount(priceData?.[1]);
+    setRatio(priceData?.[2]);
+    setLoading(false);
+
   };
 
   return (
@@ -120,7 +131,7 @@ function Swap() {
             />
           </div>
           <div className="buttonContainer my-2">
-            <PageButton name={'...'} isBold={true} />
+            <PageButton name={'...'} isBold={true}/>
           </div>
         </div>
       </div>
@@ -130,7 +141,7 @@ function Swap() {
           <div className="swapHeader">
             <span className="swapText">Swap</span>
             <span className="gearContainer" onClick={() => setShowModal(true)}>
-              <GearFill />
+              <GearFill/>
             </span>
             {showModal && (
               <ConfigModal
@@ -169,7 +180,7 @@ function Swap() {
           <div className="swapButtonContainer">
             {isConnected() ? (
               <div
-                onClick={() => runSwap(transaction, signer)}
+                onClick={() => runSwap(provider!, transaction, signer!)}
                 className="swapButton"
               >
                 Swap

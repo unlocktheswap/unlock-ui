@@ -1,13 +1,14 @@
 // Authorization function for crypto login
 import { prisma } from '@/prisma';
 import { ethers } from 'ethers';
+import { verifyMessage } from 'ethers/lib/utils';
 //  takes publicAdress and signature from credentials and returns
 //  either a user object on success or null on failure
 import { RequestInternal } from 'next-auth';
 
 export async function authorizeCrypto(
   credentials: Record<'publicAddress' | 'signedNonce' | 'spaceId', string> | undefined,
-  req: Pick<RequestInternal, 'body' | 'headers' | 'method' | 'query'>
+  req: Pick<RequestInternal, 'body' | 'headers' | 'method' | 'query'>,
 ) {
   if (!credentials) return null;
 
@@ -22,7 +23,7 @@ export async function authorizeCrypto(
   if (!user?.cryptoLoginNonce) return null;
 
   // Compute the signer address from the saved nonce and the received signature
-  const signerAddress = ethers.verifyMessage(user.cryptoLoginNonce.nonce, signedNonce);
+  const signerAddress = verifyMessage(user.cryptoLoginNonce.nonce, signedNonce);
 
   // Check that the signer address matches the public address
   //  that is trying to sign in

@@ -4,14 +4,15 @@ import Notification from '@/components/core/notify/Notification';
 import TopNav from '@/components/main/TopNav/TopNav';
 import CompoundTheme from '@/components/themes/CompoundTheme';
 import GlobalTheme from '@/components/themes/GlobalTheme';
-import {LoginModalProvider} from '@/contexts/LoginModalContext';
+import { LoginModalProvider } from '@/contexts/LoginModalContext';
 
-import {NotificationProvider, useNotificationContext} from '@/contexts/NotificationContext';
+import { NotificationProvider, useNotificationContext } from '@/contexts/NotificationContext';
 import Web3ReactProviderWrapper from '@/contexts/Web3ReactContext';
-import {Session} from '@/types/auth/Session';
-import {SessionProvider} from 'next-auth/react';
+import { Session } from '@/types/auth/Session';
+import { SessionProvider } from 'next-auth/react';
 import './globals.scss';
 import styled from 'styled-components';
+import { QueryClient, QueryClientProvider, useQuery } from 'react-query';
 
 // Based on - https://tailwindui.com/components/application-ui/page-examples/home-screens
 
@@ -20,20 +21,22 @@ interface InternalLayoutProps {
   session: Session | null;
 }
 
+const queryClient = new QueryClient();
+
 function ThemeComponent() {
   const isThemeCompound = true;
 
-  if (isThemeCompound) return <CompoundTheme/>;
+  if (isThemeCompound) return <CompoundTheme />;
 
   return (
     <div>
-      <GlobalTheme/>
+      <GlobalTheme />
     </div>
   );
 }
 
 const NotificationWrapper = () => {
-  const {notification, hideNotification} = useNotificationContext();
+  const { notification, hideNotification } = useNotificationContext();
 
   if (!notification) return null;
 
@@ -57,31 +60,30 @@ const StyledMain = styled.main`
   min-height: 100vh;
 `;
 
-function ChildLayout({children, session}: InternalLayoutProps) {
+function ChildLayout({ children, session }: InternalLayoutProps) {
   const origin = typeof window !== 'undefined' && window.location.hostname ? window.location.hostname : '';
-
 
   return (
     <Web3ReactProviderWrapper>
       <SessionProvider session={session}>
-        <ThemeComponent/>
+        <ThemeComponent />
         <LoginModalProvider>
-          <LoginModal/>
-          <TopNav/>
+          <LoginModal />
+          <TopNav />
           <StyledMain>{children}</StyledMain>
         </LoginModalProvider>
       </SessionProvider>
-      <NotificationWrapper/>
+      <NotificationWrapper />
     </Web3ReactProviderWrapper>
   );
 }
 
-export default function InternalLayout({children, session}: InternalLayoutProps) {
+export default function InternalLayout({ children, session }: InternalLayoutProps) {
   return (
-
     <NotificationProvider>
-      <ChildLayout session={session}>{children}</ChildLayout>
+      <QueryClientProvider client={queryClient}>
+        <ChildLayout session={session}>{children}</ChildLayout>
+      </QueryClientProvider>
     </NotificationProvider>
-
   );
 }

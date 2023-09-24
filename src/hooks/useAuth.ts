@@ -1,9 +1,9 @@
-import { coinbaseWallet } from '@/app/login/connectors/coinbaseWallet';
-import { metaMask } from '@/app/login/connectors/metaMask';
-import { Connector } from '@web3-react/types';
-import { ethers } from 'ethers';
-import { signIn, signOut } from 'next-auth/react';
-import { useCallback, useState } from 'react';
+import {coinbaseWallet} from '@/app/login/connectors/coinbaseWallet';
+import {metaMask} from '@/app/login/connectors/metaMask';
+import {Web3Provider} from '@ethersproject/providers';
+import {Connector} from '@web3-react/types';
+import {signIn, signOut} from 'next-auth/react';
+import {useCallback, useState} from 'react';
 
 export function useAuth() {
   const [web3Selection, setWeb3Selection] = useState<{ connector: Connector } | undefined>(); // ['metamask', 'walletconnect', 'coinbase'
@@ -24,8 +24,8 @@ export function useAuth() {
 
       // Get the wallet provider, the signer and address
       //  see: https://docs.ethers.org/v6/getting-started/#starting-signing
-      const provider = new ethers.BrowserProvider(window.ethereum as any);
-      const signer = await provider.getSigner();
+      const provider = new Web3Provider(window.ethereum as any);
+      const signer = provider.getSigner();
       const publicAddress = await signer.getAddress();
 
       // Send the public address to generate a nonce associates with our account

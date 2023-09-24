@@ -1,7 +1,7 @@
 import React from 'react'
 
 const CurrencyField = (props: any) => {
-  const getPrice = (value: any) => {
+  const getPrice = async (value: any) => {
     props.getSwapPrice(value)
   }
 

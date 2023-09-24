@@ -1,7 +1,6 @@
 .App {
   text-align: center;
-  background-color: #e3eef3;
-  min-height: 100vh;
+
 }
 
 body {
@@ -38,6 +37,7 @@ body {
 }
 
 .connectButton {
+  margin-top: 16px;
   background-color: rgb(253, 234, 241) !important;
   border-radius: 16px !important;
   border: 1px solid #fff !important;
@@ -65,23 +65,25 @@ body {
 }
 
 .swapContainer {
-  background-color: rgb(203, 231, 240);
+  background-color: #222;
   width: 440px;
-  height: 350px;
+  height: 360px;
   margin: 0 auto;
   top: 50%;
   border-radius: 24px;
   border: 1px solid #fff;
   padding: 6px;
+  color: white;
 }
 
 .swapHeader {
   text-align: left;
   padding: 4px 20px 0px 20px;
+  color: white;
 }
 
 .swapText {
-  color: #000;
+  color: white;
   font-size: 20px;
 }
 
@@ -93,10 +95,11 @@ body {
 /******************************************************************************/
 /* Currency Input */
 .currencyInput {
-  background-color: rgb(217, 236, 242);
+  background-color: #333;
   margin: 10px !important;
   padding: 10px;
   border-radius: 20px;
+  color: white;
 }
 
 .currencyInput:hover {
@@ -122,7 +125,10 @@ body {
   display: inline-block;
   width: 100%;
   border: none;
-  background-color: rgb(217, 236, 242);
+  background-color: #444;
+  border-radius: 8px;
+  padding: 0 4px;
+  color: white;
 }
 
 .tokenContainer {
@@ -132,7 +138,7 @@ body {
 .tokenName {
   font-size: 28px;
   display: block;
-  color: #000;
+  color: white;
 }
 
 .balanceContainer {
@@ -143,7 +149,7 @@ body {
   width: 100%;
   font-size: 16px;
   display: inline;
-  color: #000;
+  color: white;
 }
 
 /******************************************************************************/
