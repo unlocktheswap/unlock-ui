@@ -1,10 +1,12 @@
 'use client';
 
 import './App.css';
-import {JsonRpcSigner, Web3Provider} from '@ethersproject/providers';
-import {useState, useEffect} from 'react';
-import {ethers} from 'ethers';
-import {GearFill} from 'react-bootstrap-icons';
+import Button from '@/components/core/buttons/Button';
+import BuyMembershipModal from '@/components/swap/BuyMembershipModal';
+import { JsonRpcSigner, Web3Provider } from '@ethersproject/providers';
+import { useState, useEffect } from 'react';
+import { ethers } from 'ethers';
+import { GearFill } from 'react-bootstrap-icons';
 
 import PageButton from './components/PageButton';
 import ConnectButton from './components/ConnectButton';
@@ -12,19 +14,12 @@ import ConfigModal from './components/ConfigModal';
 import CurrencyField from './components/CurrencyField';
 
 import BeatLoader from 'react-spinners/BeatLoader';
-import {
-  getWethContract,
-  getUniContract,
-  getPrice,
-  runSwap,
-} from './AlphaRouterService';
+import { getWethContract, getUniContract, getPrice, runSwap } from './AlphaRouterService';
 
 function Swap() {
   const [provider, setProvider] = useState<Web3Provider | undefined>(undefined);
   const [signer, setSigner] = useState<JsonRpcSigner | undefined>(undefined);
-  const [signerAddress, setSignerAddress] = useState<string | undefined>(
-    undefined,
-  );
+  const [signerAddress, setSignerAddress] = useState<string | undefined>(undefined);
 
   const [slippageAmount, setSlippageAmount] = useState(2);
   const [deadlineMinutes, setDeadlineMinutes] = useState(10);
@@ -35,15 +30,12 @@ function Swap() {
   const [transaction, setTransaction] = useState<any>(undefined);
   const [loading, setLoading] = useState<boolean | undefined>(undefined);
   const [ratio, setRatio] = useState<any>(undefined);
-  const [wethContract, setWethContract] = useState<ethers.Contract | undefined>(
-    undefined,
-  );
-  const [uniContract, setUniContract] = useState<ethers.Contract | undefined>(
-    undefined,
-  );
+  const [wethContract, setWethContract] = useState<ethers.Contract | undefined>(undefined);
+  const [uniContract, setUniContract] = useState<ethers.Contract | undefined>(undefined);
   const [wethAmount, setWethAmount] = useState<Number | undefined>(undefined);
   const [uniAmount, setUniAmount] = useState<Number | undefined>(undefined);
 
+  const [showBuyModal, setShowBuyModal] = useState<boolean>(false);
   useEffect(() => {
     const onLoad = async () => {
       const provider = await new Web3Provider(window.ethereum, 5);
@@ -51,7 +43,7 @@ function Swap() {
       setProvider(provider);
 
       let signer1 = provider.getSigner();
-      console.log('signer1', signer1)
+      console.log('signer1', signer1);
       setSigner(signer1);
 
       const wethContract = getWethContract(provider);
@@ -70,7 +62,7 @@ function Swap() {
     console.log('getSigner', provider);
     if (provider.provider && 'request' in provider.provider) {
       try {
-        await provider.provider.request?.({method: 'eth_requestAccounts'});
+        await provider.provider.request?.({ method: 'eth_requestAccounts' });
         const signer = provider.getSigner();
         setSigner(signer);
       } catch (error) {
@@ -101,27 +93,29 @@ function Swap() {
     setLoading(true);
     setInputAmount(inputAmount);
 
-    let priceData = await getPrice(
-      provider!,
-      100,
-      '4',
-      signerAddress!,
-    );
+    let priceData = await getPrice(provider!, 100, '4', signerAddress!);
 
     console.log('priceData', priceData);
     setTransaction(priceData?.[0]);
     setOutputAmount(priceData?.[1]);
     setRatio(priceData?.[2]);
     setLoading(false);
-
   };
 
   return (
     <div className="App">
-      <div className="fixed right-2 top-16">
+      <div className="w-full flex justify-end">
+        <div className="flex flex-col">
+          <Button primary variant={'contained'} onClick={() => setShowBuyModal(true)}>
+            Buy Membership
+          </Button>
+          <div className="text-xs mt-4">Buy subscription to make it free to swap</div>
+        </div>
+      </div>
+      <div className="fixed right-8 top-16">
         <div className="buttonContainer buttonContainerTop my-2"></div>
 
-        <div className="rightNav">
+        {/*<div className="rightNav">
           <div className="connectButtonContainer">
             <ConnectButton
               provider={provider}
@@ -133,7 +127,7 @@ function Swap() {
           <div className="buttonContainer my-2">
             <PageButton name={'...'} isBold={true}/>
           </div>
-        </div>
+        </div>*/}
       </div>
 
       <div className="appBody">
@@ -141,7 +135,7 @@ function Swap() {
           <div className="swapHeader">
             <span className="swapText">Swap</span>
             <span className="gearContainer" onClick={() => setShowModal(true)}>
-              <GearFill/>
+              <GearFill />
             </span>
             {showModal && (
               <ConfigModal
@@ -155,34 +149,15 @@ function Swap() {
           </div>
 
           <div className="swapBody">
-            <CurrencyField
-              field="input"
-              tokenName="WETH"
-              getSwapPrice={getSwapPrice}
-              signer={signer}
-              balance={wethAmount}
-            />
-            <CurrencyField
-              field="output"
-              tokenName="UNI"
-              value={outputAmount}
-              signer={signer}
-              balance={uniAmount}
-              spinner={BeatLoader}
-              loading={loading}
-            />
+            <CurrencyField field="input" tokenName="WETH" getSwapPrice={getSwapPrice} signer={signer} balance={wethAmount} />
+            <CurrencyField field="output" tokenName="UNI" value={outputAmount} signer={signer} balance={uniAmount} spinner={BeatLoader} loading={loading} />
           </div>
 
-          <div className="ratioContainer">
-            {ratio && <>{`1 UNI = ${ratio} WETH`}</>}
-          </div>
+          <div className="ratioContainer">{ratio && <>{`1 UNI = ${ratio} WETH`}</>}</div>
 
           <div className="swapButtonContainer">
             {isConnected() ? (
-              <div
-                onClick={() => runSwap(provider!, transaction, signer!)}
-                className="swapButton"
-              >
+              <div onClick={() => runSwap(provider!, transaction, signer!)} className="swapButton">
                 Swap
               </div>
             ) : (
@@ -193,6 +168,7 @@ function Swap() {
           </div>
         </div>
       </div>
+      <BuyMembershipModal open={showBuyModal} onClose={() => setShowBuyModal(false)} />
     </div>
   );
 }
